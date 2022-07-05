@@ -1,4 +1,5 @@
 import json
+from telnetlib import STATUS
 
 from django.shortcuts import render
 from django.http import JsonResponse
@@ -17,6 +18,21 @@ class OwnerView(View):
 
         return JsonResponse({'message':'created'}, status=201)
 
+    def get(self, request):
+        owners = Owner.objects.all()
+        results = []
+
+        for owner in owners:
+            results.append(
+                {
+                    "name" : owner.name,
+                    "_email" : owner._email,
+                    "age" : owner.age
+                }
+            )
+
+        return JsonResponse({'results':results}, status=200)
+
 class DogView(View):
     def post(self, request):
         data = json.loads(request.body)
@@ -29,3 +45,43 @@ class DogView(View):
         )
 
         return JsonResponse({'message':'created'}, status=201)
+
+    def get(self, request):
+        dogs = Dog.objects.all()
+        results = []
+
+        for dog in dogs:
+            results.append(
+                {
+                    "name" : dog.name,
+                    "age" : dog.age,
+                    "owner_name" : dog.owner.name
+                }
+            )
+
+        return JsonResponse({'results':results}, status=200)
+
+class Owner_DogView(View):
+    def get(self, request):
+        owners = Owner.objects.all()
+        dogs = Dog.objects.all()
+        results = []
+
+        for owner in owners:
+            results.append(
+                        {
+                            "name" : owner.name,
+                            "_email" : owner._email,
+                            "age" : owner.age,
+                        }
+                    )
+            for dog in dogs:
+                if dog.owner_id == owner.id: 
+                    results.append(
+                        {
+                            "dog_name" : dog.name,
+                            "dog_age" : dog.age
+                        }
+                    )
+        
+        return JsonResponse({'result':results}, status=200)
