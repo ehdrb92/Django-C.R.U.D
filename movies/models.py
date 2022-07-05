@@ -9,14 +9,21 @@ class Actor(models.Model):
 
     class Meta:
         db_table = 'actors'
+    
+    def __str__(self):
+        return self.first_name, self.last_name
 
 class Movie(models.Model):
     title = models.CharField(max_length=50)
     release_date = models.DateField()
     running_time = models.IntegerField()
+    add_to_actor = models.ManyToManyField(Actor)
 
     class Meta:
         db_table = 'movies'
+    
+    def __str__(self):
+        return self.title
 
 class Actor_movie(models.Model):
     actor = models.ForeignKey('Actor', on_delete=models.CASCADE)
