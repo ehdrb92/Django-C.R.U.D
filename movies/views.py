@@ -1,4 +1,5 @@
 import json
+from os import link
 from turtle import title
 
 from django.http import JsonResponse
@@ -19,6 +20,7 @@ class ActorView(View):
 
     def get(self, request):
         actors = Actor.objects.all()
+        links = Actor_movie.objects.all()
         result = []
 
         for actor in actors:
@@ -29,6 +31,13 @@ class ActorView(View):
                     'data_of_birth' : actor.date_of_birth
                 }
             )
+            for link in links:
+                if link.actor_id == actor.id:
+                    result.append(
+                        {
+                            'title' : link.movie.title
+                        }
+                    )
 
         return JsonResponse({'result':result}, status=200)
 
@@ -45,6 +54,7 @@ class MovieView(View):
 
     def get(self, request):
         movies = Movie.objects.all()
+        links = Actor_movie.objects.all()
         result = []
 
         for movie in movies:
@@ -55,6 +65,13 @@ class MovieView(View):
                     'running_time' : movie.running_time 
                 }
             )
+            for link in links:
+                if link.movie_id == movie.id:
+                    result.append(
+                        {
+                            'actor' : link.actor.first_name
+                        }
+                    )
 
         return JsonResponse({'result':result}, status=200)
 
